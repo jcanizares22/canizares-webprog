@@ -1,7 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-// Components
-import Layout from "./Components/Layout";
+// Components & Layouts
+import Layout from "./layouts/Layout";
+import AuthLayout from "./layouts/AuthLayout";
 
 // Pages
 import ArticlePage from "./pages/ArticlePage";
@@ -10,6 +11,8 @@ import ArticleDetailPage from "./pages/ArticleDetailPage";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SignInPage from "./pages/AuthPages/SignInPage";
+import SignUpPage from "./pages/AuthPages/SignUpPage";
 
 const routes = [
   {
@@ -39,6 +42,26 @@ const routes = [
       {
         path: "*",
         element: <NotFoundPage />,
+      },
+    ],
+  },
+  {
+    path: "/signin",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "",
+        element: <SignInPage />,
+      },
+    ],
+  },
+  {
+    path: "/signup",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "",
+        element: <SignUpPage />,
       },
     ],
   },
