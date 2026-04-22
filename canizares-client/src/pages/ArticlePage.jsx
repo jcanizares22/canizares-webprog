@@ -9,10 +9,10 @@ const ArticlePage = () => {
           Articles
         </p>
         <h1 className="max-w-xl text-3xl font-bold leading-tight text-zinc-900 sm:text-4xl">
-Caul&apos;s signature techniques and recipes.
+        Caul&apos;s signature techniques and recipes.
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-Discover what makes our burgers and pizzas unforgettable.
+        Discover what makes our burgers and pizzas unforgettable.
         </p>
         <div className="mt-6">
           <Button to="/">Back Home</Button>
@@ -25,7 +25,7 @@ Discover what makes our burgers and pizzas unforgettable.
             Featured Articles
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-zinc-900">
-Caul&apos;s kitchen highlights
+            React library highlights
           </h2>
         </div>
 
