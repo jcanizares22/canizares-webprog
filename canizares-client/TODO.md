@@ -1,1 +1,10 @@
-# TODO Steps for Import Fixes (ALL COMPLETED)\n\n1. [x] Create TODO.md (done)\n2. [x] Edit App.jsx - Fix Layout import case (Components capital C)\n3. [x] Edit Components/Layout.jsx - Fix Navbar import path to \"./Navbar\"\n4. [x] Edit pages/HomePage.jsx - Fix Button import case\n5. [x] Edit pages/AboutPage.jsx - Fix Button import case\n6. [x] Edit pages/ArticlePage.jsx - Fix Button import case (verified correct)\n7. [x] Update TODO.md with completion\n8. [x] Ready to test - Run `cd canizares-client && npm run dev`
+# Task: Connect article-content.js to ArticleListPage.jsx & ArticleList.jsx following current design with matching images for React topics
+
+## Steps:
+1. [x] Update article-content.js to include image URLs matching React topics
+2. [x] Implement ArticleList.jsx as dynamic component rendering cards from article-content.js matching ArticlePage card design
+3. [x] Create ArticleListPage.jsx page using ArticleList component with hero layout like HomePage
+4. [x] Update ArticlePage.jsx to use ArticleList and add navigation to ArticleListPage
+5. [x] Add route for ArticleListPage in App.jsx
+6. [x] Test navigation and rendering
+7. [ ] attempt_completion

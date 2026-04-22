@@ -1,42 +1,37 @@
 import Button from "../Components/Button";
 import ArticleList from "../Components/ArticleList";
 
-const ArticlePage = () => {
+const ArticleListPage = () => {
   return (
     <div className="flex w-full flex-col gap-6">
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900">
-          Articles
+Caul&apos;s Kitchen Articles
         </p>
         <h1 className="max-w-xl text-3xl font-bold leading-tight text-zinc-900 sm:text-4xl">
-Caul&apos;s signature techniques and recipes.
+The craft behind Caul&apos;s burgers, pizzas, and signature techniques.
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-Discover what makes our burgers and pizzas unforgettable.
+          Dive into React fundamentals, state management, routing, lifecycle, and modern component patterns for building scalable apps.
         </p>
         <div className="mt-6">
-          <Button to="/">Back Home</Button>
+          <Button to="/articles">Featured Articles</Button>
         </div>
       </section>
 
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900">
-            Featured Articles
+            Complete Article Library
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-zinc-900">
-Caul&apos;s kitchen highlights
+            All React guides and tutorials
           </h2>
         </div>
-
         <ArticleList />
-
-        <div className="mt-8 text-center">
-          <Button to="/articles/list">View Complete Library</Button>
-        </div>
       </section>
     </div>
   );
 };
 
-export default ArticlePage;
+export default ArticleListPage;
