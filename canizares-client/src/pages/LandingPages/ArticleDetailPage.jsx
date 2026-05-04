@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import Button from "../Components/Button";
-import articles from "../assets/article-content.js";
+import Button from "../../Components/Button.jsx";
+import articles from "../../assets/article-content.js";
 
 const ArticleDetailPage = () => {
   const { name } = useParams();
@@ -20,7 +20,8 @@ const ArticleDetailPage = () => {
           {article.title}
         </h1>
         <div className="mt-6">
-          <Button to="/articles/list">← Back to Articles</Button>
+          <Button to="/articles">← Back to Articles</Button>
+
         </div>
       </section>
 

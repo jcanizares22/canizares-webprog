@@ -3,65 +3,79 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // Components & Layouts
 import Layout from "./layouts/Layout";
 import AuthLayout from "./layouts/AuthLayout";
+import DashLayout from "./layouts/DashLayout";
 
 // Pages
-import ArticlePage from "./pages/ArticlePage";
-import ArticleListPage from "./pages/ArticleListPage";
-import ArticleDetailPage from "./pages/ArticleDetailPage";
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
+import ArticlePage from "./pages/LandingPages/ArticlePage";
+import ArticleListPage from "./pages/LandingPages/ArticleListPage";
+import ArticleDetailPage from "./pages/LandingPages/ArticleDetailPage";
+import HomePage from "./pages/LandingPages/HomePage";
+import AboutPage from "./pages/LandingPages/AboutPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SignInPage from "./pages/AuthPages/SignInPage";
 import SignUpPage from "./pages/AuthPages/SignUpPage";
 
+// Dashboard Pages
+import DashboardPage from "./pages/DashboardPages/DashboardPage";
+import ReportsPage from "./pages/DashboardPages/ReportsPage";
+import UsersPage from "./pages/DashboardPages/UsersPage";
+
 const routes = [
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
-        path: "",
+        path: '',
         element: <HomePage />,
       },
       {
-        path: "about",
+        path: 'about',
         element: <AboutPage />,
       },
       {
-        path: "articles",
-        element: <ArticlePage />,
-      },
-      {
-        path: "articles/list",
+        path: 'articles',
         element: <ArticleListPage />,
       },
       {
-        path: "articles/:name",
+        path: 'articles/:name',
         element: <ArticleDetailPage />,
       },
-      {
-        path: "*",
-        element: <NotFoundPage />,
-      },
+
     ],
   },
   {
-    path: "/signin",
+    path: "auth/",
     element: <AuthLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
-        path: "",
+        path: "signin",
         element: <SignInPage />,
       },
+      {
+        path: "signup",
+        element: <SignUpPage />,
+      },
     ],
   },
   {
-    path: "/signup",
-    element: <AuthLayout />,
+    path: "dashboard/",
+    element: <DashLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         path: "",
-        element: <SignUpPage />,
+        element: <DashboardPage />,
+      },
+      {
+        path: "reports",
+        element: <ReportsPage />,
+      },
+      {
+        path: "users",
+        element: <UsersPage />,
       },
     ],
   },
@@ -70,11 +84,7 @@ const routes = [
 const router = createBrowserRouter(routes);
 
 function App() {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

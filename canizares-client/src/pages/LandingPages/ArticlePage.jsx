@@ -1,37 +1,42 @@
-import Button from "../Components/Button";
-import ArticleList from "../Components/ArticleList";
+import Button from "../../Components/Button";
+import ArticleList from "../../Components/ArticleList";
 
-const ArticleListPage = () => {
+const ArticlePage = () => {
   return (
     <div className="flex w-full flex-col gap-6">
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900">
-Caul&apos;s Kitchen Articles
+          Articles
         </p>
         <h1 className="max-w-xl text-3xl font-bold leading-tight text-zinc-900 sm:text-4xl">
-The craft behind Caul&apos;s burgers, pizzas, and signature techniques.
+          Caul&apos;s signature techniques and recipes.
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-          Dive into React fundamentals, state management, routing, lifecycle, and modern component patterns for building scalable apps.
+          Discover what makes our burgers and pizzas unforgettable.
         </p>
         <div className="mt-6">
-          <Button to="/articles">Featured Articles</Button>
+          <Button to="/">Back Home</Button>
         </div>
       </section>
 
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900">
-            Complete Article Library
+            Featured Articles
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-zinc-900">
-            All React guides and tutorials
+            React library highlights
           </h2>
         </div>
+
         <ArticleList />
+
+        <div className="mt-8 text-center">
+          <Button to="/articles/list">View Complete Library</Button>
+        </div>
       </section>
     </div>
   );
 };
 
-export default ArticleListPage;
+export default ArticlePage;

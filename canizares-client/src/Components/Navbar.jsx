@@ -53,13 +53,13 @@ const NavBar = () => {
             ))}
           </nav>
           <NavLink
-            to="/signin"
+            to="/auth/signin"
             className={navLinkClassName}
           >
             Sign In
           </NavLink>
           <NavLink
-            to="/signup"
+            to="/auth/signup"
             className={[
               "border-2",
               "border-amber-900 bg-amber-900 text-white shadow-sm shadow-amber-900/20 hover:shadow-md hover:shadow-amber-900/30",

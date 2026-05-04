@@ -1,4 +1,4 @@
-import Button from "../Components/Button";
+import Button from "../../Components/Button";
 
 const HomePage = () => {
   return (
