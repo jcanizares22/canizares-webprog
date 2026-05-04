@@ -5,8 +5,10 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
+    age: "",
+    contactNumber: "",
     password: "",
     confirmPassword: ""
   });
@@ -25,8 +27,10 @@ const SignUpPage = () => {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (/\s/.test(formData.username.trim())) {
+      newErrors.username = "Username cannot contain spaces";
     }
 
     if (!formData.email.trim()) {
@@ -35,10 +39,18 @@ const SignUpPage = () => {
       newErrors.email = "Please enter a valid email address";
     }
 
+    if (!formData.age || isNaN(Number(formData.age)) || Number(formData.age) < 1) {
+      newErrors.age = "Age must be a number only (1 or more)";
+    }
+
+    if (!formData.contactNumber || !/^\d{11}$/.test(formData.contactNumber)) {
+      newErrors.contactNumber = "Contact number must be 11 digits";
+    }
+
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -86,24 +98,29 @@ const SignUpPage = () => {
       <div className="space-y-4">
         <div>
           <label htmlFor="name" className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            Full name
+            Username
           </label>
+
           <input
-            id="name"
-            name="name"
+            id="username"
+            name="username"
             type="text"
-            value={formData.name}
+
+            value={formData.username}
             onChange={handleChange}
+
             className={`w-full rounded-xl border-2 bg-zinc-50 px-4 py-3 text-lg placeholder-zinc-400 focus:ring-2 transition-all ${
-              errors.name 
+              errors.username 
                 ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" 
+
                 : "border-zinc-300 focus:border-zinc-900 focus:ring-zinc-900/20"
             }`}
             placeholder="John Doe"
           />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+          {errors.username && (
+            <p className="mt-1 text-sm text-red-500">{errors.username}</p>
           )}
+
         </div>
 
         <div>

@@ -1,80 +1,270 @@
-import React from 'react';
-import { Typography, Card, CardContent, Stack, Button, TextField } from '@mui/material';
-import { BarChart, LineChart } from '@mui/x-charts';
-import { PieChart } from '@mui/x-charts/PieChart';
-import { barData, pieData } from '../../data/dashboardData.js';
+import { useRef } from 'react';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import PrintIcon from '@mui/icons-material/Print';
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { Gauge } from "@mui/x-charts/Gauge";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { DataGrid } from '@mui/x-data-grid';
 
-function ReportsPage() {
+const columns = [
+  { field: 'id', headerName: 'ID', width: 90 },
+  {
+    field: 'firstName',
+    headerName: 'First name',
+    width: 150,
+    editable: true,
+  },
+  {
+    field: 'lastName',
+    headerName: 'Last name',
+    width: 150,
+    editable: true,
+  },
+  {
+    field: 'age',
+    headerName: 'Age',
+    type: 'number',
+    width: 110,
+    editable: true,
+  },
+  {
+    field: 'fullName',
+    headerName: 'Full name',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 160,
+    valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
+  },
+];
+
+const rows = [
+  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
+  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
+  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
+  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
+  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+];
+
+const ReportsPage = () => {
+  const printRef = useRef(null);
+
+  const handlePrint = () => {
+    const printContent = printRef.current;
+
+    if (!printContent) {
+      return;
+    }
+
+    const printWindow = window.open('', '_blank', 'width=1200,height=900');
+
+    if (!printWindow) {
+      return;
+    }
+
+    const headMarkup = Array.from(
+      document.querySelectorAll('style, link[rel="stylesheet"]')
+    )
+      .map((node) => node.outerHTML)
+      .join('');
+
+    const exportedAt = new Intl.DateTimeFormat('en-US', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+    }).format(new Date());
+
+    // MUI-styled table data from DataGrid
+    const tableHeaderRow = columns.map(col => `<th style="font-weight: bold; background-color: #f5f5f5; border: 1px solid #e0e0e0; padding: 16px; color: #1976d2;">${col.headerName}</th>`).join('');
+    const tableBodyRows = rows.map(row => `<tr style="background-color: ${rows.indexOf(row) % 2 === 0 ? '#fafafa' : 'white'}">
+      <td style="border: 1px solid #e0e0e0; padding: 16px;">${row.id || ''}</td>
+      <td style="border: 1px solid #e0e0e0; padding: 16px;">${row.firstName || ''}</td>
+      <td style="border: 1px solid #e0e0e0; padding: 16px;">${row.lastName || ''}</td>
+      <td style="border: 1px solid #e0e0e0; padding: 16px;">${row.age || ''}</td>
+      <td style="border: 1px solid #e0e0e0; padding: 16px;">${(row.firstName || '') + ' ' + (row.lastName || '')}</td>
+    </tr>`).join('');
+
+    printWindow.document.write('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Laboratory 5 Reports PDF</title>');
+
+    printWindow.document.write(headMarkup);
+
+    printWindow.document.write('<style>' +
+      '@import url(https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap); ' +
+      '@page {size: A4; margin: 20mm;} * {box-sizing: border-box;} ' +
+      'body {margin: 0; font-family: "Roboto", sans-serif; background: #fff; color: #333; line-height: 1.6;} ' +
+      '.report-shell {padding: 24px;} .report-header {margin-bottom: 32px; padding-bottom: 20px; border-bottom: 4px solid #1976d2;} ' +
+      '.report-header h1 {margin: 0 0 12px; font-size: 32px; font-weight: 700; color: #1976d2;} .report-header p {margin: 0 0 8px; font-size: 16px; color: #666;} ' +
+      '.lab-table {width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px;} .lab-table th, .lab-table td {border: 1px solid #e0e0e0; padding: 16px; text-align: left;} ' +
+      '.lab-table th {background-color: #f5f5f5; font-weight: bold; color: #1976d2;} .lab-table tbody tr:nth-child(even) {background-color: #fafafa;} ' +
+      '.report-content .MuiDataGrid-root {display: none !important;} .report-content .MuiCard-root {box-shadow: none !important; border: 1px solid #e5e7eb; page-break-inside: avoid;} ' +
+      '.report-content .MuiCardContent-root {padding: 24px !important;} svg {max-width: 100%; page-break-inside: avoid;} ' +
+      '@media print {body {-webkit-print-color-adjust: exact;} .lab-table {font-size: 12px;}} ' +
+      '</style></head><body><div class="report-shell"><header class="report-header"><h1>Laboratory 5 Reports</h1><p>Laboratory report data, analytics overview, category breakdown, performance metrics.</p><p>Generated: ' + exportedAt + '</p></header><div class="report-content">');
+
+    printWindow.document.write(printContent.outerHTML);
+
+    printWindow.document.write('<table class="lab-table"><thead><tr>' + tableHeaderRow + '</tr></thead><tbody>' + tableBodyRows + '</tbody></table></div></body></html>');
+
+    printWindow.document.close();
+
+    printWindow.focus();
+
+    printWindow.print();
+
+  };
+
   return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Reports
-      </Typography>
-      <Stack spacing={3}>
-        {/* Sales Report BarChart */}
+    <Box>
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", md: "center" }}
+        spacing={2}
+        sx={{ mb: 4 }}
+      >
+        <Box>
+          <Typography variant="h4" gutterBottom>
+            Laboratory 5 Reports Page
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Report analytics overview showing generated reports,
+            category breakdown, and current completion performance.
+          </Typography>
+        </Box>
+
+        <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+          <Button variant="contained">Generate</Button>
+          <IconButton variant="outlined" color="primary" onClick={handlePrint} title="Print PDF">
+            <PrintIcon />
+          </IconButton>
+          <Button variant="outlined">Filter</Button>
+        </Stack>
+      </Stack>
+
+      <Stack ref={printRef} spacing={3}>
         <Card>
           <CardContent>
-            <Typography variant="h6">Sales Report</Typography>
+            <Typography variant="h6" gutterBottom>
+              Monthly Report Output
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              This chart compares how many reports were generated and how
+              many were completed across the last four months.
+            </Typography>
             <BarChart
               series={[
-                { data: barData[0], label: '2024' },
-                { data: barData[1], label: '2023' }
-              ]}
-              height={290}
-              xAxis={[{ data: ['Q1', 'Q2', 'Q3', 'Q4'], scaleType: 'band' }]}
-              title="Yearly Comparison"
-            />
-          </CardContent>
-        </Card>
-        {/* Monthly Trends LineChart */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Monthly Trends</Typography>
-            <LineChart
-              xAxis={[{ data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], scaleType: 'band' }]}
-              series={[
-                {
-                  data: [20, 30, 40, 38, 45, 50],
-                  label: 'Sales ($)'
-                }
+                { data: [18, 24, 20, 27], label: "Generated" },
+                { data: [12, 19, 17, 23], label: "Completed" },
               ]}
               height={300}
-              title="Monthly Sales Trend"
-            />
-          </CardContent>
-        </Card>
-        {/* Pie Chart Distribution */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Revenue Distribution</Typography>
-            <PieChart
-              series={[
+              xAxis={[
                 {
-                  data: pieData,
+                  data: ["January", "February", "March", "April"],
+                  scaleType: "band",
+                  label: "Months",
                 },
               ]}
-              width={400}
-              height={200}
             />
           </CardContent>
         </Card>
-        {/* Filters Placeholder */}
+
+        <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Report Category Share
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 3 }}
+              >
+                This chart shows the distribution of report requests by
+                category for the current reporting period.
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <PieChart
+                  series={[
+                    {
+                      data: [
+                        { id: 0, value: 14, label: "Sales" },
+                        { id: 1, value: 10, label: "Users" },
+                        { id: 2, value: 8, label: "Inventory" },
+                        { id: 3, value: 6, label: "Finance" },
+                      ],
+                    },
+                  ]}
+                  width={280}
+                  height={220}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Completion Rate
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 3 }}
+              >
+                The gauge highlights the current percentage of reports
+                completed on time based on the latest reporting cycle.
+              </Typography>
+              <Box
+                sx={{
+                  minHeight: 220,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Gauge width={180} height={180} value={78} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Stack>
+
         <Card>
           <CardContent>
-            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-              <TextField label="Date Range" size="small" />
-              <TextField label="Category" size="small" />
-              <Button variant="contained">Export PDF</Button>
-              <Button variant="outlined">Filter</Button>
-            </Stack>
-            <Typography>Advanced filters and detailed report content would go here. Using MUI sample data for visualization.</Typography>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              experimentalFeatures={{ newEditingApi: true }}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5,
+                  },
+                },
+              }}
+              pageSizeOptions={[5]}
+              checkboxSelection
+              disableRowSelectionOnClick
+            />
           </CardContent>
         </Card>
       </Stack>
-    </>
+    </Box>
   );
-}
+};
 
 export default ReportsPage;
-
-
