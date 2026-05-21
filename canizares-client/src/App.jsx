@@ -1,24 +1,29 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 // Components & Layouts
-import Layout from "./layouts/Layout";
-import AuthLayout from "./layouts/AuthLayout";
-import DashLayout from "./layouts/DashLayout";
+import Layout from './layouts/Layout';
+import AuthLayout from './layouts/AuthLayout';
+import DashLayout from './layouts/DashLayout';
 
 // Pages
-import ArticlePage from "./pages/LandingPages/ArticlePage";
-import ArticleListPage from "./pages/LandingPages/ArticleListPage";
-import ArticleDetailPage from "./pages/LandingPages/ArticleDetailPage";
-import HomePage from "./pages/LandingPages/HomePage";
-import AboutPage from "./pages/LandingPages/AboutPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import SignInPage from "./pages/AuthPages/SignInPage";
-import SignUpPage from "./pages/AuthPages/SignUpPage";
+import ArticlePage from './pages/LandingPages/ArticlePage';
+import ArticleListPage from './pages/LandingPages/ArticleListPage';
+import ArticleDetailPage from './pages/LandingPages/ArticleDetailPage';
+import HomePage from './pages/LandingPages/HomePage';
+import AboutPage from './pages/LandingPages/AboutPage';
+import NotFoundPage from './pages/NotFoundPage';
+import SignInPage from './pages/AuthPages/SignInPage';
+import SignUpPage from './pages/AuthPages/SignUpPage';
 
 // Dashboard Pages
-import DashboardPage from "./pages/DashboardPages/DashboardPage";
-import ReportsPage from "./pages/DashboardPages/ReportsPage";
-import UsersPage from "./pages/DashboardPages/UsersPage";
+import DashboardPage from './pages/DashboardPages/DashboardPage';
+import ReportsPage from './pages/DashboardPages/ReportsPage';
+import UsersPage from './pages/DashboardPages/UsersPage';
+import DashArticleListPage from './pages/DashboardPages/DashArticleListPage';
+
+// Guards
+import RequireAuth from './components/RequireAuth';
+import RequireRole from './components/RequireRole';
 
 const routes = [
   {
@@ -42,40 +47,51 @@ const routes = [
         path: 'articles/:name',
         element: <ArticleDetailPage />,
       },
-
     ],
   },
   {
-    path: "auth/",
+    path: 'auth',
     element: <AuthLayout />,
     errorElement: <NotFoundPage />,
     children: [
       {
-        path: "signin",
+        path: 'signin',
         element: <SignInPage />,
       },
       {
-        path: "signup",
+        path: 'signup',
         element: <SignUpPage />,
       },
     ],
   },
   {
-    path: "dashboard/",
-    element: <DashLayout />,
+    path: 'dashboard',
+    element: (
+      <RequireAuth>
+        <DashLayout />
+      </RequireAuth>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       {
-        path: "",
+        path: '',
         element: <DashboardPage />,
       },
       {
-        path: "reports",
+        path: 'reports',
         element: <ReportsPage />,
       },
       {
-        path: "users",
-        element: <UsersPage />,
+        path: 'articles',
+        element: <DashArticleListPage />,
+      },
+      {
+        path: 'users',
+        element: (
+          <RequireRole allowedRoles={['admin']}>
+            <UsersPage />
+          </RequireRole>
+        ),
       },
     ],
   },

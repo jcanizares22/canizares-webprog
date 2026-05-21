@@ -1,52 +1,59 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { styled, useTheme, alpha } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import InputBase from "@mui/material/InputBase";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import Button from "@mui/material/Button";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import ArticleIcon from "@mui/icons-material/Article";
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { styled, useTheme, alpha } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import CssBaseline from '@mui/material/CssBaseline';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import Button from '@mui/material/Button';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import ArticleIcon from '@mui/icons-material/Article';
+import { useAuth } from '../contexts/AuthContext';
 
 const drawerWidth = 240;
-const dashboardNavItems = [
+const dashboardBaseNavItems = [
   {
-    label: "Dashboard",
-    title: "Dashboard",
-    to: "/dashboard",
+    label: 'Dashboard',
+    title: 'Dashboard',
+    to: '/dashboard',
     icon: DashboardIcon,
   },
   {
-    label: "Reports",
-    title: "Reports",
-    to: "/dashboard/reports",
+    label: 'Reports',
+    title: 'Reports',
+    to: '/dashboard/reports',
     icon: AssessmentIcon,
   },
   {
-    label: "Users",
-    title: "Users",
-    to: "/dashboard/users",
-    icon: PeopleIcon,
+    label: 'Articles',
+    title: 'Articles',
+    to: '/dashboard/articles',
+    icon: ArticleIcon,
   },
 ];
+const usersNavItem = {
+  label: 'Users',
+  title: 'Users',
+  to: '/dashboard/users',
+  icon: PeopleIcon,
+};
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -154,14 +161,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const getPageTitle = (pathname) =>
-  dashboardNavItems.find(({ to }) => to === pathname)?.title ?? "Welcome";
+  dashboardBaseNavItems.find(({ to }) => to === pathname)?.title ?? "Welcome";
 
 const DashLayout = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
   const pageTitle = getPageTitle(location.pathname);
   const navigate = useNavigate();
+
+  const navItems = user?.role === 'admin' ? [...dashboardBaseNavItems, usersNavItem] : dashboardBaseNavItems;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -172,7 +182,8 @@ const DashLayout = () => {
   };
 
   const handleLogout = () => {
-    navigate("/");
+    logout();
+    navigate('/auth/signin');
   };
 
   return (
@@ -231,8 +242,8 @@ const DashLayout = () => {
           <Divider />
           {/* Drawer List */}
           <List>
-            {dashboardNavItems.map(({ label, to, icon: Icon }) => (
-              <ListItem key={to} disablePadding sx={{ display: "block" }}>
+            {navItems.map(({ label, to, icon: Icon }) => (
+              <ListItem key={to} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
                   component={Link}
                   to={to}
@@ -240,14 +251,14 @@ const DashLayout = () => {
                   sx={{
                     minHeight: 48,
                     px: 2.5,
-                    justifyContent: open ? "initial" : "center",
+                    justifyContent: open ? 'initial' : 'center',
                   }}
                 >
                   <ListItemIcon
                     sx={{
                       minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
                     }}
                   >
                     <Icon />

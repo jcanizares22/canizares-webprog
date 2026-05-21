@@ -25,6 +25,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { DataGrid } from '@mui/x-data-grid';
+import { createUser, deleteUser, fetchUsers, updateUser } from '../../services/userService';
 
 
 
@@ -48,41 +49,6 @@ const blankForm = {
 const labelize = (value) =>
   value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : '';
 
-const loadUsers = async () => {
-  try {
-    const response = await fetch('/src/data/users.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const usersData = await response.json();
-    return {
-      users: usersData.map((user, index) => ({
-        id: Number(user.id) || index + 1,
-        firstName: String(user.firstName ?? '').trim(),
-        lastName: String(user.lastName ?? '').trim(),
-        age: String(user.age ?? '').trim(),
-        gender: genders.includes(String(user.gender ?? '').trim().toLowerCase())
-          ? String(user.gender ?? '').trim().toLowerCase()
-          : '',
-        contactNumber: String(user.contactNumber ?? '').trim(),
-        email: String(user.email ?? '').trim().toLowerCase(),
-        role: roles.includes(String(user.role ?? '').trim().toLowerCase())
-          ? String(user.role ?? '').trim().toLowerCase()
-          : 'editor',
-        username: String(user.username ?? '').trim().toLowerCase(),
-        password: String(user.password ?? ''),
-        address: String(user.address ?? '').trim(),
-        isActive: typeof user.isActive === 'boolean' ? user.isActive : true,
-      })),
-      error: '',
-    };
-  } catch (error) {
-    console.error('Failed to load users:', error);
-    return {
-      users: [],
-      error: 'Unable to read users.json: ' + error.message,
-    };
-  }
-};
-
 const UsersPage = () => {
 
   const theme = useTheme();
@@ -102,14 +68,23 @@ const [showPassword, setShowPassword] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
-    loadUsers().then(({ users, error }) => {
-      setLoading(false);
-      if (error) {
-        setLoadError(error);
-      } else {
-        setUsers(users);
+    const load = async () => {
+      try {
+        const { data } = await fetchUsers();
+        const normalized = data.users.map((user) => ({
+          ...user,
+          id: user._id,
+          role: user.role || 'editor',
+        }));
+        setUsers(normalized);
+      } catch (error) {
+        setLoadError(error.response?.data?.message || error.message || 'Failed to load users.');
+      } finally {
+        setLoading(false);
       }
-    });
+    };
+
+    load();
   }, []);
 
   const resetForm = () => {
@@ -119,7 +94,7 @@ const [showPassword, setShowPassword] = useState(false);
 
   const openModal = (user) => {
     setModal({ open: true, id: user?.id || null });
-    setForm(user ? { ...blankForm, ...user } : { ...blankForm });
+    setForm(user ? { ...blankForm, ...user, password: '' } : { ...blankForm });
     setErrors({});
   };
 
@@ -154,13 +129,16 @@ const [showPassword, setShowPassword] = useState(false);
       ['email', 'Email'],
       ['role', 'Role'],
       ['username', 'Username'],
-      ['password', 'Password'],
       ['address', 'Address'],
     ].forEach(([key, label]) => {
       if (!String(form[key]).trim()) {
         nextErrors[key] = `${label} is required.`;
       }
     });
+
+    if (!modal.id && !String(form.password).trim()) {
+      nextErrors.password = 'Password is required.';
+    }
 
     // Enhancement 3: Beginner-friendly validation rules
     if (!nextErrors.age && !/^\d+$/.test(form.age.trim())) {
@@ -169,7 +147,7 @@ const [showPassword, setShowPassword] = useState(false);
     if (!nextErrors.username && /\s/.test(form.username.trim())) {
       nextErrors.username = 'Username must not contain spaces.';
     }
-    if (!nextErrors.password && form.password.length < 8) {
+    if (form.password && form.password.length < 8) {
       nextErrors.password = 'Password must be at least 8 characters.';
     }
     if (!nextErrors.contactNumber && !/^\d{11}$/.test(form.contactNumber.trim())) {
@@ -191,7 +169,7 @@ const [showPassword, setShowPassword] = useState(false);
     return nextErrors;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validate();
 
@@ -215,29 +193,43 @@ const [showPassword, setShowPassword] = useState(false);
       isActive: form.isActive,
     };
 
-    setUsers((prev) =>
-      modal.id
-        ? prev.map((user) => (user.id === modal.id ? { ...user, ...newUser } : user))
-        : [
-            ...prev,
-            {
-              ...newUser,
-              id: prev.reduce((max, user) => Math.max(max, Number(user.id) || 0), 0) + 1,
-            },
-          ]
-    );
+    if (modal.id && !newUser.password) {
+      delete newUser.password;
+    }
 
-    closeModal();
+    try {
+      if (modal.id) {
+        const { data } = await updateUser(modal.id, newUser);
+        setUsers((prev) => prev.map((user) => (user.id === modal.id ? { ...data, id: data._id } : user)));
+      } else {
+        const { data } = await createUser(newUser);
+        setUsers((prev) => [{ ...data, id: data._id }, ...prev]);
+      }
+      closeModal();
+    } catch (error) {
+      setErrors({ general: error.response?.data?.message || error.message });
+    }
   };
 
+  const toggleStatus = async (id) => {
+    const user = users.find((item) => item.id === id);
+    if (!user) return;
 
+    try {
+      const { data } = await updateUser(id, { isActive: !user.isActive });
+      setUsers((prev) => prev.map((item) => (item.id === id ? { ...item, ...data, id: data._id } : item)));
+    } catch (error) {
+      setLoadError(error.response?.data?.message || error.message);
+    }
+  };
 
-  const toggleStatus = (id) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id ? { ...user, isActive: !user.isActive } : user
-      )
-    );
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id);
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+    } catch (error) {
+      setLoadError(error.response?.data?.message || error.message);
+    }
   };
 
   const fieldProps = (name, label, extra = {}) => ({
@@ -340,6 +332,14 @@ const [showPassword, setShowPassword] = useState(false);
             onClick={() => toggleStatus(row.id)}
           >
             {row.isActive ? 'Disable' : 'Activate'}
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            color="error"
+            onClick={() => handleDelete(row.id)}
+          >
+            Delete
           </Button>
         </Stack>
       ),

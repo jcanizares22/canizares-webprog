@@ -46,7 +46,7 @@ const SignInPage = () => {
       setIsSubmitting(false);
       navigate("/");
     } catch (error) {
-      setErrors({ general: "Invalid credentials. Please check your email and password." });
+      setErrors({ general: error.response?.data?.message || error.message || "Invalid credentials. Please check your email and password." });
       setIsSubmitting(false);
     }
   };
