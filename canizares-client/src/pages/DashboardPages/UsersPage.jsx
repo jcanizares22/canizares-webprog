@@ -25,7 +25,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { DataGrid } from '@mui/x-data-grid';
-import { createUser, deleteUser, fetchUsers, updateUser } from '../../services/userService';
+import { registerUser, deleteUser, fetchUsers, updateUser } from '../../services/userService';
+
 
 
 
@@ -67,16 +68,29 @@ const [showPassword, setShowPassword] = useState(false);
   const [genderFilter, setGenderFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
+  const [totalUsers, setTotalUsers] = useState(0);
+
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await fetchUsers();
-        const normalized = data.users.map((user) => ({
+        setLoading(true);
+        const { data } = await fetchUsers({
+          search: searchTerm || undefined,
+          role: roleFilter || undefined,
+          gender: genderFilter || undefined,
+          status: statusFilter || undefined,
+          page: 0,
+          pageSize: 5,
+        });
+
+        const normalized = (data.users || []).map((user) => ({
           ...user,
           id: user._id,
           role: user.role || 'editor',
         }));
+
         setUsers(normalized);
+        setTotalUsers(data.total || 0);
       } catch (error) {
         setLoadError(error.response?.data?.message || error.message || 'Failed to load users.');
       } finally {
@@ -85,7 +99,8 @@ const [showPassword, setShowPassword] = useState(false);
     };
 
     load();
-  }, []);
+  }, [searchTerm, roleFilter, genderFilter, statusFilter]);
+
 
   const resetForm = () => {
     setForm(blankForm);
@@ -202,8 +217,9 @@ const [showPassword, setShowPassword] = useState(false);
         const { data } = await updateUser(modal.id, newUser);
         setUsers((prev) => prev.map((user) => (user.id === modal.id ? { ...data, id: data._id } : user)));
       } else {
-        const { data } = await createUser(newUser);
+        const { data } = await registerUser(newUser);
         setUsers((prev) => [{ ...data, id: data._id }, ...prev]);
+
       }
       closeModal();
     } catch (error) {
@@ -243,30 +259,8 @@ const [showPassword, setShowPassword] = useState(false);
     ...extra,
   });
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      // Search filter
-      const searchLower = searchTerm.toLowerCase();
-      const matchesSearch =
-        user.firstName.toLowerCase().includes(searchLower) ||
-        user.lastName.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        user.username.toLowerCase().includes(searchLower);
+  const filteredUsers = users;
 
-      // Role filter
-      const matchesRole = !roleFilter || user.role === roleFilter;
-
-      // Gender filter
-      const matchesGender = !genderFilter || user.gender === genderFilter;
-
-      // Status filter
-      const matchesStatus = !statusFilter || 
-        (statusFilter === 'active' && user.isActive) ||
-        (statusFilter === 'inactive' && !user.isActive);
-
-      return matchesSearch && matchesRole && matchesGender && matchesStatus;
-    });
-  }, [users, searchTerm, roleFilter, genderFilter, statusFilter]);
 
   const clearFilters = useCallback(() => {
     setSearchTerm('');
@@ -441,19 +435,21 @@ const [showPassword, setShowPassword] = useState(false);
             <Button variant="outlined" onClick={clearFilters} size="small">
               Clear Filters
             </Button>
-            <Chip label={`Showing ${filteredUsers.length} of ${users.length}`} size="small" />
+            <Chip label={`Showing ${filteredUsers.length} of ${totalUsers}`} size="small" />
           </Stack>
         </Box>
-        {users.length ? (
+        {filteredUsers.length ? (
           <Box sx={{ height: { xs: 400, sm: 520 }, width: '100%', minWidth: 0 }}>
             <DataGrid
               rows={filteredUsers}
               columns={columns}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10]}
+              paginationMode="client"
               initialState={{
                 pagination: { paginationModel: { pageSize: 5, page: 0 } },
               }}
+
               sx={{
                 minWidth: 0,
                 '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeader': {

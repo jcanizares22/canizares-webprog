@@ -173,6 +173,8 @@ const DashLayout = () => {
 
   const navItems = user?.role === 'admin' ? [...dashboardBaseNavItems, usersNavItem] : dashboardBaseNavItems;
 
+
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };

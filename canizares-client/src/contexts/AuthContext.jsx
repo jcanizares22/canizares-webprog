@@ -46,7 +46,14 @@ export const AuthProvider = ({ children }) => {
 
         // Validate token with backend to avoid premature redirects.
         const me = await fetchMe();
-        setUser(me.user || null);
+        // Normalize role for sidebar/menu logic
+        const normalizedRole = me?.user?.role || parsed?.user?.role || 'editor';
+
+        // Ensure `user` always contains a stable `role` field for sidebar + RequireRole.
+        setUser(me?.user
+          ? { ...me.user, role: normalizedRole }
+          : { id: parsed?.user?.id, email: parsed?.user?.email, role: normalizedRole, firstName: parsed?.user?.firstName }
+        );
         setLoading(false);
       } catch (error) {
         localStorage.removeItem('authState');

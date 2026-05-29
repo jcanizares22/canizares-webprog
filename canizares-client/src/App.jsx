@@ -87,12 +87,11 @@ const routes = [
       },
       {
         path: 'users',
-        element: (
-          <RequireRole allowedRoles={['admin']}>
-            <UsersPage />
-          </RequireRole>
-        ),
+        element: <UsersPage />,
       },
+
+
+
     ],
   },
 ];
