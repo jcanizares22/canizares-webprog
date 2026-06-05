@@ -4,8 +4,48 @@ const jwt = require('jsonwebtoken'); // For generating tokens
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}, '-password'); // Exclude the password field
-    res.json({ users });
+    const {
+      search = '',
+      role = '',
+      gender = '',
+      status = '',
+      // pagination (optional)
+      page = '0',
+      pageSize = '5',
+    } = req.query;
+
+    const pageNumber = Math.max(parseInt(page, 10) || 0, 0);
+    const limit = Math.max(parseInt(pageSize, 10) || 5, 1);
+    const skip = pageNumber * limit;
+
+    const filter = {};
+
+    const searchTrimmed = String(search).trim();
+    if (searchTrimmed) {
+      const rx = new RegExp(searchTrimmed, 'i');
+      filter.$or = [
+        { firstName: rx },
+        { lastName: rx },
+        { email: rx },
+        { username: rx },
+      ];
+    }
+
+    if (role) filter.role = role;
+    if (gender) filter.gender = gender;
+
+    if (status) {
+      if (status === 'active') filter.isActive = true;
+      if (status === 'inactive') filter.isActive = false;
+    }
+
+    const total = await User.countDocuments(filter);
+    const users = await User.find(filter, '-password')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ users, total });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -90,11 +130,13 @@ const loginUser = async (req, res) => {
       return res.status(403).json({ message: 'Your account is inactive. Please contact support.' });
     }
 
+
+
+
     if (user.role === 'viewer') {
       return res.status(403).json({ message: 'Viewer accounts are not allowed to log in.' });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
