@@ -130,13 +130,12 @@ const loginUser = async (req, res) => {
       return res.status(403).json({ message: 'Your account is inactive. Please contact support.' });
     }
 
-
-
-
     if (user.role === 'viewer') {
       return res.status(403).json({ message: 'Viewer accounts are not allowed to log in.' });
     }
 
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
