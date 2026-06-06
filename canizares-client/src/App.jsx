@@ -22,8 +22,8 @@ import UsersPage from './pages/DashboardPages/UsersPage';
 import DashArticleListPage from './pages/DashboardPages/DashArticleListPage';
 
 // Guards
-import RequireAuth from './components/RequireAuth';
-import RequireRole from './components/RequireRole';
+import RequireAuth from './Components/RequireAuth';
+import RequireRole from './Components/RequireRole';
 
 const routes = [
   {

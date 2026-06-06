@@ -3,17 +3,9 @@
   "buildCommand": "npm run build --prefix canizares-client",
   "outputDirectory": "canizares-client/dist",
   "framework": "vite",
-  "installCommand": "npm install && npm install --prefix canizares-server && npm install --prefix canizares-client",
-  "regions": ["auto"],
-  "env": {
-    "MONGO_URI": "@mongo_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "FRONTEND_URL": "@frontend_url",
-    "NODE_ENV": "production"
-  },
+  "installCommand": "npm install && npm install --prefix canizares-server && npm install --include=dev --prefix canizares-client",
   "functions": {
     "api/handler.js": {
-      "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 30,
       "includeFiles": "canizares-server/**"
